@@ -1,0 +1,6 @@
+[[0;32mPASS[0m]: test-1-venmo-trans
+[Sun Jul 10 18:38:25 MST 2016] 1 of 3 tests passed
+[[0;32mPASS[0m]: test-2-venmo-trans
+[Sun Jul 10 18:38:25 MST 2016] 2 of 3 tests passed
+[[0;32mPASS[0m]: test-3-venmo-trans
+[Sun Jul 10 18:38:25 MST 2016] 3 of 3 tests passed
