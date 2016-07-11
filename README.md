@@ -16,7 +16,7 @@ As new payments come in, edges that were formed between users with payments olde
 ├── README.md 
 ├── run.sh
 ├── src
-│     └── median_degree.java
+│     └── rolling_median.py
 ├── venmo_input
 │   └── venmo-trans.txt
 ├── venmo_output
@@ -24,12 +24,17 @@ As new payments come in, edges that were formed between users with payments olde
 └── insight_testsuite
        ├── run_tests.sh
        └── tests
-            └── test-1-venmo-trans
+            ├── test-1-venmo-trans
             │   ├── venmo_input
             │   │   └── venmo-trans.txt
             │   └── venmo_output
             │       └── output.txt
-            └── your-own-test
+            ├── test-2-venmo-trans
+            │    ├── venmo_input
+            │    │      └── venmo-trans.txt
+            │    └── venmo_output
+            │           └── output.txt
+            └── test-3-venmo-trans
                  ├── venmo_input
                  │      └── venmo-trans.txt
                  └── venmo_output
@@ -37,10 +42,12 @@ As new payments come in, edges that were formed between users with payments olde
 ```
 ### Programming Language and version:
 Python 2.7.9
+
 ### Default libraries:
 1. sys
 2. time
 3. json
+
 ### Run Program:
 To execute the main program:
 ```bash
