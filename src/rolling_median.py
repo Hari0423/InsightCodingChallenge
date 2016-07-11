@@ -1,26 +1,36 @@
+# Insight Data Engineering Coding Challenge
+# Author: Satya Hari Priya Vemparala
 import sys
 import json
 import time
 
-# number of rolling medians should be the same as number of transactions
-
-
-
 def main(inputF, outputF):
-    graph = {}
-    times = []
-    actors = []
-    fi = open(inputF,'r')
+    """
+    main function loads transactions into memory line by line and verifies the 60sec time frame
+    :param inputF: path of input text file that contains Venmo transactions
+    :param outputF: path of output text file to which rolling median is printed to
+    """
+    graph = {}      # Grpah dictionary that contains the vertices and edges
+    times = []      # List that contains the timestamps for the 60sec time frame
+    actors = []     # 2D list (list of list) that contains target-actor for transactions in the 60sec time frame
+    new_time = []   # new_time and new_actors lists are supplementary Data Structures to facilitate deletion
+    new_actors = []
 
-    open(outputF, 'w').close()
+    fi = open(inputF,'r')
+    open(outputF, 'w').close()      # make the output file empty
     fo = open(outputF,'w')
 
     for line in fi:
-        data = json.loads(line)
-        timestamp = int(time.mktime(time.strptime(data['created_time'],
-                                                  '%Y-%m-%dT%H:%M:%SZ')))
-        new_time = []
-        new_actors=[]
+        data = json.loads(line)     # Deserializes transactions into str-object dictionary key-value pair
+        """
+        data['target'] - target user that the transaction has been made to
+        data['actor'] - actor user that has made the transaction
+        data['created_time'] - time the transaction was registered
+        """
+
+        timestamp = int(time.mktime(time.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%SZ')))
+
+        # First transaction
         if not times:
             times.append(timestamp)
             l=[]
@@ -29,8 +39,9 @@ def main(inputF, outputF):
             actors.append(l)
             updateGraph(data['target'], data['actor'], graph)
         else:
-            sorted(times)
+            sorted(times, reverse=True)
             maximum = times[0]
+            # Timestamps and maximum timestamp from the times list are equal
             if maximum == timestamp:
                 times.append(timestamp)
                 l = []
@@ -39,7 +50,8 @@ def main(inputF, outputF):
                 actors.append(l)
                 updateGraph(data['target'],data['actor'],graph)
             else:
-                if max(timestamp, maximum) == timestamp:        # Scenario 1 update G change
+                # Scenario 1: Current transaction is greater than max timestamp in times list and is within the 60sec time frame
+                if max(timestamp, maximum) == timestamp:
                     if timestamp-maximum <=60:
                         new_time.append(timestamp)
                         l = []
@@ -62,7 +74,8 @@ def main(inputF, outputF):
                         times = new_time[:]
                         actors = new_actors[:]
 
-                    else:                           #Scenario 3
+                    else:
+                        # Scenario 2: Current transaction is greater than max timestamp and is greater than 60sec time frame
                         del times[:]
                         del actors[:]
                         graph.clear()
@@ -73,27 +86,34 @@ def main(inputF, outputF):
                         actors.append(l)
                         updateGraph(data['target'], data['actor'], graph)
                 else:
-                    if maximum-timestamp<=60:   # Scenario 2
+                    # Scenario 3: Current transaction is lesser than max timestamp and is lesser than 60sec time frame
+                    if maximum-timestamp<=60:
                         times.append(timestamp)
                         l = []
                         l.append(data['target'])
                         l.append(data['actor'])
                         actors.append(l)
                         updateGraph(data['target'], data['actor'], graph)
-                    # (else) implicit Scenario 4
-        med =[]
 
+                    #(else) implicit Scenario 4: Current transaction is lesser than max timestamp
+                                                 # and is greater than 60sec time frame, Hence discarded
+
+        # Calculate median of values from grpah dictionary
+        med =[]
         for key,value in graph.items():
-            #print key, value
             med.append(len(value))
-        #print ""
         writing = str("%.2f" % median(med)) +"\n"
         fo.write(writing)
-        #print med
-        #print median(med)
     fo.close()
 
+
 def updateGraph(target, actor, graph):
+    """
+    updateGraph function adds new vertices and links edges which represents transactions in the graph
+    :param target: target user in the transaction
+    :param actor: actor user to whom the transaction has been made to
+    :param graph: dictionary that contains the graph
+    """
     dict_key = target
     dict_value = actor
     if not (dict_key in graph):
@@ -107,7 +127,14 @@ def updateGraph(target, actor, graph):
     else:
         graph[dict_value].append(dict_key)
 
+
 def delGraph(target, actor, graph):
+    """
+    delGraph function deletes the transaction's vertices and edges in the graph
+    :param target: target user in the transaction
+    :param actor: actor user to whom the transaction has been made to
+    :param graph: dictionary that contains the graph
+    """
     dict_key = target
     dict_value = actor
     if len(graph[dict_key]) == 1 and graph[dict_key][0] == actor:
@@ -121,13 +148,18 @@ def delGraph(target, actor, graph):
         if target in graph[dict_value]:
             graph[dict_value].remove(target)
 
+
 def median(L):
+    """
+    Median function calculates the median for a given list
+    :param L: List of values from the graph dictionary
+    :return: median float
+    """
     L = sorted(L)
     n = len(L)
     m = n - 1
     return (L[n/2] + L[m/2]) / 2.00
 
-start_time = time.time()
+
+# arguments -> location of input file and output file
 main(sys.argv[1], sys.argv[2])
-#main("/home/varun/MEGAsync/ASU/ResearchDev/Dev/Workspaces/PyCharm/coding-challenge-master/venmo_input/venmo-trans.txt", "/home/varun/MEGAsync/ASU/ResearchDev/Dev/Workspaces/PyCharm/coding-challenge-master/venmo_output/output.txt")
-#print("--- %s seconds ---" % (time.time() - start_time))
