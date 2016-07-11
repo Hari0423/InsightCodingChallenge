@@ -1,5 +1,4 @@
 # Insight Data Engineering Coding Challenge
-# Author: Satya Hari Priya Vemparala
 import sys
 import json
 import time
@@ -13,8 +12,6 @@ def main(inputF, outputF):
     graph = {}      # Grpah dictionary that contains the vertices and edges
     times = []      # List that contains the timestamps for the 60sec time frame
     actors = []     # 2D list (list of list) that contains target-actor for transactions in the 60sec time frame
-    new_time = []   # new_time and new_actors lists are supplementary Data Structures to facilitate deletion
-    new_actors = []
 
     fi = open(inputF,'r')
     open(outputF, 'w').close()      # make the output file empty
@@ -29,7 +26,8 @@ def main(inputF, outputF):
         """
 
         timestamp = int(time.mktime(time.strptime(data['created_time'],'%Y-%m-%dT%H:%M:%SZ')))
-
+        new_time = []   # new_time and new_actors lists are supplementary DS to facilitate deletion
+        new_actors = []
         # First transaction
         if not times:
             times.append(timestamp)
@@ -130,7 +128,7 @@ def updateGraph(target, actor, graph):
 
 def delGraph(target, actor, graph):
     """
-    delGraph function deletes the transaction's vertices and edges in the graph
+    delGrpah function deletes the transaction's vertices and edges in the graph
     :param target: target user in the transaction
     :param actor: actor user to whom the transaction has been made to
     :param graph: dictionary that contains the graph
